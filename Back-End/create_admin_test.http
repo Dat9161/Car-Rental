@@ -1,0 +1,23 @@
+### Tạo tài khoản admin qua API
+POST http://localhost:8080/api/auth/register
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123",
+  "fullName": "System Administrator",
+  "phone": "0123456789"
+}
+
+### Đăng nhập admin
+POST http://localhost:8080/api/auth/login
+Content-Type: application/json
+
+{
+  "username": "admin",
+  "password": "admin123"
+}
+
+### Test endpoint admin (cần token từ login response)
+GET http://localhost:8080/api/auth/admin
+Authorization: Bearer {{admin_token}}
