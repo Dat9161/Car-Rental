@@ -47,6 +47,10 @@ const BookingScreen: React.FC = () => {
   const [notes, setNotes] = useState('');
   const [loading, setLoading] = useState(false);
 
+  // Phương thức nhận xe
+  const [pickupType, setPickupType] = useState<'PICKUP' | 'DELIVERY'>('PICKUP');
+  const [deliveryAddress, setDeliveryAddress] = useState('');
+
   // ----- SET DEFAULT END DATE +1 -----
   useEffect(() => {
     const t = new Date();
@@ -81,6 +85,11 @@ const BookingScreen: React.FC = () => {
     }
     if (endDate <= startDate) {
       Alert.alert('Lỗi', 'Ngày kết thúc phải sau ngày bắt đầu.');
+      return false;
+    }
+    // Validate địa chỉ giao xe
+    if (pickupType === 'DELIVERY' && !deliveryAddress.trim()) {
+      Alert.alert('Lỗi', 'Vui lòng nhập địa chỉ giao xe.');
       return false;
     }
     return true;
@@ -154,6 +163,8 @@ const BookingScreen: React.FC = () => {
         startAt: toIsoString(startDate),
         endAt: toIsoString(endDate),
         notes: notes.trim() || null,
+        pickupType: pickupType,
+        deliveryAddress: pickupType === 'DELIVERY' ? deliveryAddress.trim() : null,
       };
 
       console.log('PAYLOAD GỬI API:', payload);
@@ -180,12 +191,11 @@ const BookingScreen: React.FC = () => {
       if (response.ok) {
         Alert.alert(
           'Đặt xe thành công!',
-          result?.id
-            ? `Mã đặt xe: #${result.id}\nChờ quản trị viên xác nhận.`
-            : 'Đặt xe thành công.',
+          'Bạn có muốn thanh toán ngay bằng QR Bank?',
           [
             {
-              text: 'OK',
+              text: 'Để sau',
+              style: 'cancel',
               onPress: () =>
                 navigation.dispatch(
                   CommonActions.reset({
@@ -194,10 +204,22 @@ const BookingScreen: React.FC = () => {
                   })
                 ),
             },
+            {
+              text: 'Thanh toán ngay',
+              onPress: () =>
+                navigation.navigate('Payment', {
+                  bookingId: result.id,
+                  amount: calculateTotalPrice(),
+                  currency: vehicle.currency,
+                }),
+            },
           ]
         );
       } else {
-        Alert.alert('Lỗi', result?.message || 'Không thể đặt xe.');
+        // Server trả về error message trong field 'error' hoặc 'message'
+        const errorMsg = result?.error || result?.message || 'Không thể đặt xe.';
+        console.log('LỖI TỪ SERVER:', errorMsg);
+        Alert.alert('Lỗi', errorMsg);
       }
     } catch (err) {
       console.log('LỖI:', err);
@@ -358,15 +380,78 @@ const BookingScreen: React.FC = () => {
   )}
 </View>
 
+{/* PHƯƠNG THỨC NHẬN XE */}
+<View style={styles.card}>
+  <Text style={styles.cardTitle}>Phương thức nhận xe</Text>
+  
+  <View style={styles.pickupOptions}>
+    <TouchableOpacity
+      style={[
+        styles.pickupOption,
+        pickupType === 'PICKUP' && styles.pickupOptionSelected,
+      ]}
+      onPress={() => setPickupType('PICKUP')}
+    >
+      <Ionicons
+        name="business-outline"
+        size={24}
+        color={pickupType === 'PICKUP' ? '#007bff' : '#666'}
+      />
+      <Text
+        style={[
+          styles.pickupOptionText,
+          pickupType === 'PICKUP' && styles.pickupOptionTextSelected,
+        ]}
+      >
+        Nhận tại gara
+      </Text>
+    </TouchableOpacity>
+
+    <TouchableOpacity
+      style={[
+        styles.pickupOption,
+        pickupType === 'DELIVERY' && styles.pickupOptionSelected,
+      ]}
+      onPress={() => setPickupType('DELIVERY')}
+    >
+      <Ionicons
+        name="car-outline"
+        size={24}
+        color={pickupType === 'DELIVERY' ? '#007bff' : '#666'}
+      />
+      <Text
+        style={[
+          styles.pickupOptionText,
+          pickupType === 'DELIVERY' && styles.pickupOptionTextSelected,
+        ]}
+      >
+        Giao tại địa chỉ
+      </Text>
+    </TouchableOpacity>
+  </View>
+
+  {pickupType === 'DELIVERY' && (
+    <TextInput
+      style={styles.addressInput}
+      placeholder="Nhập địa chỉ giao xe..."
+      placeholderTextColor="#999"
+      value={deliveryAddress}
+      onChangeText={setDeliveryAddress}
+      multiline={true}
+      numberOfLines={2}
+    />
+  )}
+</View>
+
 {/* GHI CHÚ - NOTES */}
 <View style={styles.card}>
   <Text style={styles.cardTitle}>Ghi chú (nếu có)</Text>
   <TextInput
     style={styles.notesInput}
-    placeholder="Ví dụ: Giao xe tại sân bay Tân Sơn Nhất, cần hóa đơn VAT, xe màu trắng..."
+    placeholder="Ví dụ: Cần hóa đơn VAT, xe màu trắng..."
     placeholderTextColor="#999"
     multiline={true}
-    numberOfLines={4}
+    numberOfLines={3}
     textAlignVertical="top"
     value={notes}
     onChangeText={setNotes}
@@ -494,4 +579,46 @@ const styles = StyleSheet.create({
   maxHeight: 160,
   marginTop: 8,
 },
+  // Pickup type styles
+  pickupOptions: {
+    flexDirection: 'row',
+    gap: 12,
+    marginTop: 8,
+  },
+  pickupOption: {
+    flex: 1,
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#ddd',
+    backgroundColor: '#f9f9f9',
+  },
+  pickupOptionSelected: {
+    borderColor: '#007bff',
+    backgroundColor: '#e7f1ff',
+  },
+  pickupOptionText: {
+    marginTop: 8,
+    fontSize: 14,
+    fontWeight: '500',
+    color: '#666',
+  },
+  pickupOptionTextSelected: {
+    color: '#007bff',
+    fontWeight: '600',
+  },
+  addressInput: {
+    backgroundColor: '#f9f9f9',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 10,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    fontSize: 15,
+    marginTop: 12,
+    minHeight: 60,
+  },
 });

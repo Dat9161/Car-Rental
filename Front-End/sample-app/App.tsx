@@ -14,6 +14,7 @@ import VehicleDetailScreen from './src/screens/VehicleDetailScreen';
 import BookingScreen from './src/screens/BookingScreen';
 import BookingHistoryScreen from './src/screens/BookingHistoryScreen';
 import ProfileScreen from './src/screens/ProfileScreen';
+import PaymentScreen from './src/screens/PaymentScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -25,6 +26,7 @@ function HomeStackNavigator() {
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="VehicleDetail" component={VehicleDetailScreen} />
       <Stack.Screen name="Booking" component={BookingScreen} />
+      <Stack.Screen name="Payment" component={PaymentScreen} />
     </Stack.Navigator>
   );
 }

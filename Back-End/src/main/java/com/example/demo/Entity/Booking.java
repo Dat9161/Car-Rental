@@ -53,6 +53,15 @@ public class Booking {
     @Column(name = "notes", length = 255)
     private String notes;
 
+    // Phương thức nhận xe
+    @Enumerated(EnumType.STRING)
+    @Column(name = "pickup_type", length = 20)
+    private PickupType pickupType = PickupType.PICKUP;
+
+    // Địa chỉ giao xe (nếu chọn DELIVERY)
+    @Column(name = "delivery_address", length = 500)
+    private String deliveryAddress;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     private java.sql.Timestamp createdAt;
 
@@ -61,6 +70,11 @@ public class Booking {
 
     public enum BookingStatus {
         PENDING, CONFIRMED, ACTIVE, COMPLETED, CANCELLED, REFUNDED
+    }
+
+    public enum PickupType {
+        PICKUP,    // Nhận xe tại gara
+        DELIVERY   // Giao xe tại địa chỉ
     }
 
     public Long getId() {
@@ -145,6 +159,22 @@ public class Booking {
 
     public java.sql.Timestamp getUpdatedAt() {
         return updatedAt;
+    }
+
+    public PickupType getPickupType() {
+        return pickupType;
+    }
+
+    public void setPickupType(PickupType pickupType) {
+        this.pickupType = pickupType;
+    }
+
+    public String getDeliveryAddress() {
+        return deliveryAddress;
+    }
+
+    public void setDeliveryAddress(String deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
     }
 }
 

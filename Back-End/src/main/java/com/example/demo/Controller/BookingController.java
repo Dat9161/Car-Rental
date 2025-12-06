@@ -26,13 +26,19 @@ public class BookingController {
     @PostMapping
     @PreAuthorize("hasRole('ADMIN') or hasRole('CUSTOMER')")
     public ResponseEntity<Map<String, Object>> create(@Valid @RequestBody BookingCreateRequest request) {
-        Booking created = bookingService.createBooking(request);
+        try {
+            Booking created = bookingService.createBooking(request);
 
-        Map<String, Object> res = new HashMap<>();
-        res.put("id", created.getId());
-        res.put("message", "Đặt xe thành công");
+            Map<String, Object> res = new HashMap<>();
+            res.put("id", created.getId());
+            res.put("message", "Đặt xe thành công");
 
-        return ResponseEntity.status(201).body(res);
+            return ResponseEntity.status(201).body(res);
+        } catch (RuntimeException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+        }
     }
 
     @GetMapping("/me")

@@ -20,6 +20,8 @@ public class BookingResponse {
     private BigDecimal totalAmount;
     private String currency;
     private String notes;
+    private String pickupType;
+    private String deliveryAddress;
 
     public static BookingResponse fromEntity(Booking booking) {
         BookingResponse r = new BookingResponse();
@@ -35,6 +37,8 @@ public class BookingResponse {
         r.totalAmount = booking.getTotalAmount();
         r.currency = booking.getCurrency();
         r.notes = booking.getNotes();
+        r.pickupType = booking.getPickupType() != null ? booking.getPickupType().name() : "PICKUP";
+        r.deliveryAddress = booking.getDeliveryAddress();
         return r;
     }
 
@@ -50,6 +54,8 @@ public class BookingResponse {
     public BigDecimal getTotalAmount() { return totalAmount; }
     public String getCurrency() { return currency; }
     public String getNotes() { return notes; }
+    public String getPickupType() { return pickupType; }
+    public String getDeliveryAddress() { return deliveryAddress; }
 }
 
 

@@ -63,6 +63,27 @@ public class BookingService {
         booking.setCurrency(vehicle.getCurrency());
         booking.setNotes(req.getNotes());
 
+        // Phương thức nhận xe (mặc định PICKUP nếu không có)
+        if (req.getPickupType() != null && !req.getPickupType().trim().isEmpty()) {
+            try {
+                booking.setPickupType(Booking.PickupType.valueOf(req.getPickupType().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                booking.setPickupType(Booking.PickupType.PICKUP);
+            }
+        } else {
+            booking.setPickupType(Booking.PickupType.PICKUP);
+        }
+        
+        System.out.println("=== Pickup Type: " + booking.getPickupType());
+
+        // Địa chỉ giao xe (bắt buộc nếu DELIVERY)
+        if (booking.getPickupType() == Booking.PickupType.DELIVERY) {
+            if (req.getDeliveryAddress() == null || req.getDeliveryAddress().trim().isEmpty()) {
+                throw new RuntimeException("Vui lòng nhập địa chỉ giao xe!");
+            }
+            booking.setDeliveryAddress(req.getDeliveryAddress().trim());
+        }
+
         return bookingRepository.save(booking);
     }
 

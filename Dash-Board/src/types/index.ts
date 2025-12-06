@@ -52,6 +52,11 @@ export interface VehicleRequest {
   description?: string;
 }
 
+export enum PickupType {
+  PICKUP = 'PICKUP',
+  DELIVERY = 'DELIVERY'
+}
+
 export interface Booking {
   id: number;
   vehicleId: number;
@@ -65,6 +70,8 @@ export interface Booking {
   totalAmount: number;
   currency: string;
   notes?: string;
+  pickupType?: PickupType;
+  deliveryAddress?: string;
 }
 
 export interface BookingCreateRequest {
@@ -102,5 +109,49 @@ export interface RegisterRequest {
   password: string;
   fullName: string;
   phone?: string;
+}
+
+// Payment Types
+export enum PaymentMethod {
+  CASH = 'CASH',
+  CREDIT_CARD = 'CREDIT_CARD',
+  DEBIT_CARD = 'DEBIT_CARD',
+  BANK_TRANSFER = 'BANK_TRANSFER',
+  DIGITAL_WALLET = 'DIGITAL_WALLET',
+  QR_BANK = 'QR_BANK'
+}
+
+export enum PaymentStatus {
+  PENDING = 'PENDING',
+  COMPLETED = 'COMPLETED',
+  FAILED = 'FAILED',
+  REFUNDED = 'REFUNDED',
+  CANCELLED = 'CANCELLED',
+  EXPIRED = 'EXPIRED'
+}
+
+export interface Payment {
+  id: number;
+  bookingId: number;
+  amount: number;
+  currency: string;
+  method: PaymentMethod;
+  status: PaymentStatus;
+  provider?: string;
+  providerTxnId?: string;
+  paidAt?: string;
+  createdAt?: string;
+  qrContent?: string;
+  qrImageUrl?: string;
+  transferContent?: string;
+  expiresAt?: string;
+  bankName?: string;
+  accountNumber?: string;
+  accountName?: string;
+}
+
+export interface PaymentCreateRequest {
+  bookingId: number;
+  method: PaymentMethod;
 }
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { bookingApi, vehicleApi } from '../services/api';
 import { useAuth } from '../contexts/AuthContext';
-import { CheckCircle, PlayCircle, XCircle, Plus } from 'lucide-react';
+import { CheckCircle, PlayCircle, XCircle, Plus, MapPin, Building, Eye } from 'lucide-react';
 import type { Booking, Vehicle, BookingStatus } from '../types';
 import { format } from 'date-fns';
 import BookingModal from '../components/BookingModal';
@@ -13,6 +13,8 @@ const Bookings = () => {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [filterStatus, setFilterStatus] = useState<BookingStatus | 'ALL'>('ALL');
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -24,6 +26,11 @@ const Bookings = () => {
         bookingApi.getMyBookings(),
         vehicleApi.list(),
       ]);
+      // Debug: log bookings để kiểm tra pickupType
+      console.log('Bookings data:', bookingsData);
+      const deliveryBookings = bookingsData.filter(b => b.pickupType === 'DELIVERY');
+      console.log('Delivery bookings:', deliveryBookings);
+      
       setBookings(bookingsData);
       setVehicles(vehiclesData);
     } catch (error) {
@@ -134,10 +141,10 @@ const Bookings = () => {
                   Xe
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ngày bắt đầu
+                  Thời gian
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Ngày kết thúc
+                  Nhận xe
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Tổng tiền
@@ -164,13 +171,31 @@ const Bookings = () => {
                       <div className="text-sm font-medium text-gray-900">{booking.vehicleTitle}</div>
                       <div className="text-sm text-gray-500">{booking.vehicleType}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {format(new Date(booking.startAt), 'dd/MM/yyyy HH:mm')}
+                    <td className="px-6 py-4 text-sm text-gray-900">
+                      <div>{format(new Date(booking.startAt), 'dd/MM/yyyy HH:mm')}</div>
+                      <div className="text-gray-500">→ {format(new Date(booking.endAt), 'dd/MM/yyyy HH:mm')}</div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      {format(new Date(booking.endAt), 'dd/MM/yyyy HH:mm')}
+                    <td className="px-6 py-4">
+                      <div className="flex items-center space-x-1">
+                        {booking.pickupType === 'DELIVERY' ? (
+                          <>
+                            <MapPin className="w-4 h-4 text-blue-500" />
+                            <span className="text-sm text-blue-600">Giao tận nơi</span>
+                          </>
+                        ) : (
+                          <>
+                            <Building className="w-4 h-4 text-gray-500" />
+                            <span className="text-sm text-gray-600">Tại gara</span>
+                          </>
+                        )}
+                      </div>
+                      {booking.pickupType === 'DELIVERY' && booking.deliveryAddress && (
+                        <div className="text-xs text-gray-500 mt-1 max-w-xs truncate" title={booking.deliveryAddress}>
+                          {booking.deliveryAddress}
+                        </div>
+                      )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-green-600">
                       {booking.totalAmount.toLocaleString('vi-VN')} {booking.currency}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -222,6 +247,16 @@ const Bookings = () => {
                             <span>Hủy</span>
                           </button>
                         )}
+                        <button
+                          onClick={() => {
+                            setSelectedBooking(booking);
+                            setShowDetailModal(true);
+                          }}
+                          className="flex items-center space-x-1 px-3 py-1 bg-gray-50 text-gray-600 rounded hover:bg-gray-100 transition-colors"
+                          title="Chi tiết"
+                        >
+                          <Eye className="w-4 h-4" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -241,6 +276,107 @@ const Bookings = () => {
             fetchData();
           }}
         />
+      )}
+
+      {/* Detail Modal */}
+      {showDetailModal && selectedBooking && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-bold">Chi tiết đặt xe #{selectedBooking.id}</h3>
+              <button
+                onClick={() => setShowDetailModal(false)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                <XCircle className="w-6 h-6" />
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              {/* Thông tin xe */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-700 mb-2">Thông tin xe</h4>
+                <p className="text-lg font-medium">{selectedBooking.vehicleTitle}</p>
+                <p className="text-sm text-gray-500">{selectedBooking.vehicleType}</p>
+              </div>
+
+              {/* Thời gian */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-700 mb-2">Thời gian thuê</h4>
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-gray-500">Bắt đầu</p>
+                    <p className="font-medium">{format(new Date(selectedBooking.startAt), 'dd/MM/yyyy HH:mm')}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-500">Kết thúc</p>
+                    <p className="font-medium">{format(new Date(selectedBooking.endAt), 'dd/MM/yyyy HH:mm')}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Phương thức nhận xe */}
+              <div className="bg-gray-50 p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-700 mb-2">Phương thức nhận xe</h4>
+                <div className="flex items-center space-x-2">
+                  {selectedBooking.pickupType === 'DELIVERY' ? (
+                    <>
+                      <MapPin className="w-5 h-5 text-blue-500" />
+                      <span className="font-medium text-blue-600">Giao xe tận nơi</span>
+                    </>
+                  ) : (
+                    <>
+                      <Building className="w-5 h-5 text-gray-500" />
+                      <span className="font-medium">Nhận xe tại gara</span>
+                    </>
+                  )}
+                </div>
+                {selectedBooking.pickupType === 'DELIVERY' && selectedBooking.deliveryAddress && (
+                  <div className="mt-2 p-3 bg-blue-50 rounded border border-blue-200">
+                    <p className="text-xs text-blue-600 mb-1">Địa chỉ giao xe:</p>
+                    <p className="text-sm font-medium text-blue-800">{selectedBooking.deliveryAddress}</p>
+                  </div>
+                )}
+              </div>
+
+              {/* Ghi chú */}
+              {selectedBooking.notes && (
+                <div className="bg-yellow-50 p-4 rounded-lg border border-yellow-200">
+                  <h4 className="font-semibold text-yellow-700 mb-2">Ghi chú từ khách hàng</h4>
+                  <p className="text-sm text-yellow-800">{selectedBooking.notes}</p>
+                </div>
+              )}
+
+              {/* Tổng tiền */}
+              <div className="bg-green-50 p-4 rounded-lg">
+                <h4 className="font-semibold text-gray-700 mb-2">Thanh toán</h4>
+                <div className="flex justify-between items-center">
+                  <span>Tổng tiền:</span>
+                  <span className="text-xl font-bold text-green-600">
+                    {selectedBooking.totalAmount.toLocaleString('vi-VN')} {selectedBooking.currency}
+                  </span>
+                </div>
+              </div>
+
+              {/* Trạng thái */}
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Trạng thái:</span>
+                <span className={`px-3 py-1 text-sm font-semibold rounded-full ${statusColors[selectedBooking.status]}`}>
+                  {statusLabels[selectedBooking.status]}
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6 flex justify-end">
+              <button
+                onClick={() => setShowDetailModal(false)}
+                className="px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300"
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

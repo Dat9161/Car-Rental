@@ -5,6 +5,7 @@ import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Vehicles from './pages/Vehicles';
 import Bookings from './pages/Bookings';
+import Payments from './pages/Payments';
 import Layout from './components/Layout';
 
 const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
@@ -54,6 +55,16 @@ const AppRoutes = () => {
           <PrivateRoute>
             <Layout>
               <Bookings />
+            </Layout>
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/payments"
+        element={
+          <PrivateRoute>
+            <Layout>
+              <Payments />
             </Layout>
           </PrivateRoute>
         }

@@ -1,6 +1,6 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { LayoutDashboard, Car, Calendar, LogOut, User } from 'lucide-react';
+import { LayoutDashboard, Car, Calendar, CreditCard, LogOut, User } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -16,10 +16,11 @@ const Layout = ({ children }: LayoutProps) => {
     navigate('/login');
   };
 
-  const navItems = [
+  const navItems: { path: string; label: string; icon: any; adminOnly?: boolean }[] = [
     { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
     { path: '/vehicles', label: 'Xe', icon: Car },
     { path: '/bookings', label: 'Đặt xe', icon: Calendar },
+    { path: '/payments', label: 'Thanh toán', icon: CreditCard, adminOnly: true },
   ];
 
   return (
@@ -35,6 +36,9 @@ const Layout = ({ children }: LayoutProps) => {
           {/* Navigation */}
           <nav className="flex-1 p-4 space-y-2">
             {navItems.map((item) => {
+              // Ẩn menu adminOnly nếu không phải admin
+              if (item.adminOnly && !isAdmin) return null;
+              
               const Icon = item.icon;
               const isActive = location.pathname === item.path;
               return (

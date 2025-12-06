@@ -129,5 +129,37 @@ export const bookingApi = {
   },
 };
 
+// Payment APIs
+import type { Payment, PaymentCreateRequest, PaymentMethod } from '../types';
+
+export const paymentApi = {
+  create: async (data: PaymentCreateRequest): Promise<Payment> => {
+    const response = await api.post<Payment>('/payments', data);
+    return response.data;
+  },
+  getById: async (id: number): Promise<Payment> => {
+    const response = await api.get<Payment>(`/payments/${id}`);
+    return response.data;
+  },
+  getByBooking: async (bookingId: number): Promise<Payment[]> => {
+    const response = await api.get<Payment[]>(`/payments/booking/${bookingId}`);
+    return response.data;
+  },
+  getMyPayments: async (): Promise<Payment[]> => {
+    const response = await api.get<Payment[]>('/payments/me');
+    return response.data;
+  },
+  confirm: async (id: number, txnId?: string): Promise<Payment> => {
+    const response = await api.post<Payment>(`/payments/${id}/confirm`, null, {
+      params: { txnId }
+    });
+    return response.data;
+  },
+  cancel: async (id: number): Promise<Payment> => {
+    const response = await api.post<Payment>(`/payments/${id}/cancel`);
+    return response.data;
+  },
+};
+
 export default api;
 
