@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
-import type { Vehicle, VehicleRequest, VehicleType } from '../types';
+import type { Vehicle, VehicleRequest } from '../types';
+import { VehicleType } from '../types';
 
 interface VehicleModalProps {
   vehicle: Vehicle | null;
