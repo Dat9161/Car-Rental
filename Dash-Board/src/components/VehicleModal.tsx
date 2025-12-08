@@ -47,27 +47,27 @@ const VehicleModal = ({ vehicle, onClose, onSave }: VehicleModalProps) => {
   };
 
   const vehicleTypes: VehicleType[] = [
-    'SEDAN',
-    'SUV',
-    'HATCHBACK',
-    'COUPE',
-    'CONVERTIBLE',
-    'WAGON',
-    'PICKUP',
-    'VAN',
-    'MOTORCYCLE',
+    VehicleType.SEDAN,
+    VehicleType.SUV,
+    VehicleType.HATCHBACK,
+    VehicleType.COUPE,
+    VehicleType.CONVERTIBLE,
+    VehicleType.WAGON,
+    VehicleType.PICKUP,
+    VehicleType.VAN,
+    VehicleType.MOTORCYCLE,
   ];
 
   const vehicleTypeLabels: Record<VehicleType, string> = {
-    SEDAN: 'Sedan',
-    SUV: 'SUV',
-    HATCHBACK: 'Hatchback',
-    COUPE: 'Coupe',
-    CONVERTIBLE: 'Convertible',
-    WAGON: 'Wagon',
-    PICKUP: 'Pickup',
-    VAN: 'Van',
-    MOTORCYCLE: 'Xe máy',
+    [VehicleType.SEDAN]: 'Sedan',
+    [VehicleType.SUV]: 'SUV',
+    [VehicleType.HATCHBACK]: 'Hatchback',
+    [VehicleType.COUPE]: 'Coupe',
+    [VehicleType.CONVERTIBLE]: 'Convertible',
+    [VehicleType.WAGON]: 'Wagon',
+    [VehicleType.PICKUP]: 'Pickup',
+    [VehicleType.VAN]: 'Van',
+    [VehicleType.MOTORCYCLE]: 'Xe máy',
   };
 
   return (
