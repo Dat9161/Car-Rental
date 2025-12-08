@@ -6,8 +6,7 @@
 
 export const API_CONFIG = {
   // URL cho production (khi build APK)
-  // ⚠️ THAY ĐỔI URL NÀY SAU KHI DEPLOY BACKEND LÊN RAILWAY
-  PRODUCTION_URL: 'https://YOUR-APP-NAME.up.railway.app',
+  PRODUCTION_URL: 'https://car-rental-production-8324.up.railway.app',
   
   // URL cho development
   DEV_ANDROID_URL: 'http://10.0.2.2:8080',
