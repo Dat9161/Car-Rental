@@ -11,7 +11,10 @@ import type {
   VehicleType
 } from '../types';
 
-const API_BASE_URL = 'http://localhost:8080/api';
+// Production URL (Railway)
+const API_BASE_URL = import.meta.env.PROD 
+  ? 'https://car-rental-production-8324.up.railway.app/api'
+  : 'http://localhost:8080/api';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
