@@ -16,6 +16,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, CommonActions } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getApiBaseUrl } from '../config/api.config';
 
 interface PaymentData {
   id: number;
@@ -41,7 +42,7 @@ const PaymentScreen: React.FC = () => {
   const [payment, setPayment] = useState<PaymentData | null>(null);
   const [countdown, setCountdown] = useState(0);
 
-  const baseUrl = Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
+  const baseUrl = getApiBaseUrl();
 
   useEffect(() => {
     createPayment();

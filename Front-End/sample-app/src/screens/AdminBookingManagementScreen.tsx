@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getApiBaseUrl } from '../config/api.config';
 
 interface Booking {
   id: number;
@@ -57,7 +58,7 @@ const AdminBookingManagementScreen: React.FC = () => {
       }
 
       // Note: This endpoint might need to be implemented in the backend
-      const response = await fetch('http://localhost:8080/api/bookings/admin', {
+      const response = await fetch(`${getApiBaseUrl()}/api/bookings/admin`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -139,7 +140,7 @@ const AdminBookingManagementScreen: React.FC = () => {
   const handleConfirmBooking = async (bookingId: number) => {
     try {
       const token = await getStoredToken();
-      const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}/confirm`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/bookings/${bookingId}/confirm`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -160,7 +161,7 @@ const AdminBookingManagementScreen: React.FC = () => {
   const handleCompleteBooking = async (bookingId: number) => {
     try {
       const token = await getStoredToken();
-      const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}/complete`, {
+      const response = await fetch(`${getApiBaseUrl()}/api/bookings/${bookingId}/complete`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -189,7 +190,7 @@ const AdminBookingManagementScreen: React.FC = () => {
           onPress: async () => {
             try {
               const token = await getStoredToken();
-              const response = await fetch(`http://localhost:8080/api/bookings/${bookingId}/cancel`, {
+              const response = await fetch(`${getApiBaseUrl()}/api/bookings/${bookingId}/cancel`, {
                 method: 'POST',
                 headers: {
                   'Authorization': `Bearer ${token}`,

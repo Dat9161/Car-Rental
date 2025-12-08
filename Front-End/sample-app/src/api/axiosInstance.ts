@@ -1,14 +1,10 @@
 // src/api/axiosInstance.ts
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
-
-const API_BASE_URL = Platform.OS === 'android'
-  ? 'http://10.0.2.2:8080'  // Android emulator
-  : 'http://localhost:8080'; // iOS simulator
+import { getApiBaseUrl } from '../config/api.config';
 
 const api = axios.create({
-  baseURL: API_BASE_URL,
+  baseURL: getApiBaseUrl(),
   timeout: 10000,
   headers: {
     'Content-Type': 'application/json',
@@ -33,7 +29,6 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       await AsyncStorage.multiRemove(['userToken', 'userInfo']);
-      // Có thể điều hướng về Login ở đây nếu dùng context
     }
     return Promise.reject(error);
   }

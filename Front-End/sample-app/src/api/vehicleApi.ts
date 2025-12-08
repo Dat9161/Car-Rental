@@ -1,42 +1,11 @@
 // src/api/vehicleApi.ts
 import axios from 'axios';
-import { Platform } from 'react-native';
-
-const getBaseUrl = () => {
-  const base = __DEV__
-    ? (Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080')
-    : 'https://your-api.com';
-  console.log('API BASE URL:', base); // LOG 1: Xem URL đang dùng
-  return base;
-};
+import { getApiBaseUrl } from '../config/api.config';
 
 const api = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL: getApiBaseUrl(),
   timeout: 10000,
 });
-
-// LOG 2: In ra mọi request
-api.interceptors.request.use((config) => {
-  console.log('GỌI API:', config.method?.toUpperCase(), config.url);
-  return config;
-});
-
-// LOG 3: In ra lỗi chi tiết
-api.interceptors.response.use(
-  (response) => {
-    console.log('NHẬN DỮ LIỆU:', response.data);
-    return response;
-  },
-  (error) => {
-    console.log('LỖI API:', {
-      url: error.config?.url,
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-    });
-    return Promise.reject(error);
-  }
-);
 
 export interface VehiclePhoto {
   id: number;
@@ -54,7 +23,7 @@ export interface Vehicle {
   description?: string;
   status?: string;
   photos?: VehiclePhoto[];
-  primaryPhotoUrl?: string; // URL của ảnh chính
+  primaryPhotoUrl?: string;
 }
 
 export const fetchVehicles = async (): Promise<Vehicle[]> => {
@@ -62,7 +31,7 @@ export const fetchVehicles = async (): Promise<Vehicle[]> => {
     const response = await api.get<Vehicle[]>('/api/vehicles');
     return response.data || [];
   } catch (error: any) {
-    console.log('LỖI KẾT NỐI:', error.message); // LOG 4: Lỗi cuối cùng
+    console.log('LỖI KẾT NỐI:', error.message);
     throw new Error('Không thể kết nối đến server');
   }
 };

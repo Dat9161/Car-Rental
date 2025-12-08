@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, CommonActions } from '@react-navigation/native';
 import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getApiBaseUrl } from '../config/api.config';
 
 interface Vehicle {
   id: number;
@@ -169,10 +170,7 @@ const BookingScreen: React.FC = () => {
 
       console.log('PAYLOAD GỬI API:', payload);
 
-      const baseUrl =
-        Platform.OS === 'android'
-          ? 'http://10.0.2.2:8080'
-          : 'http://localhost:8080';
+      const baseUrl = getApiBaseUrl();
 
       const response = await fetch(`${baseUrl}/api/bookings`, {
         method: 'POST',

@@ -1,16 +1,9 @@
 // src/api/authApi.ts
 import axios from 'axios';
-import { Platform } from 'react-native';
-
-const getBaseUrl = () => {
-  if (__DEV__) {
-    return Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080';
-  }
-  return 'https://your-production.com';
-};
+import { getApiBaseUrl } from '../config/api.config';
 
 const api = axios.create({
-  baseURL: getBaseUrl(),
+  baseURL: getApiBaseUrl(),
   timeout: 10000,
   headers: { 'Content-Type': 'application/json' },
 });

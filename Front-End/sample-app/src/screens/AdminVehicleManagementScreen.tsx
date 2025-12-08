@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getApiBaseUrl } from '../config/api.config';
 
 interface Vehicle {
   id: number;
@@ -36,7 +37,7 @@ const AdminVehicleManagementScreen: React.FC = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:8080/api/vehicles', {
+      const response = await fetch(`${getApiBaseUrl()}/api/vehicles`, {
         headers: {
           'Authorization': `Bearer ${token}`,
         },
@@ -95,7 +96,7 @@ const AdminVehicleManagementScreen: React.FC = () => {
           onPress: async () => {
             try {
               const token = await getStoredToken();
-              const response = await fetch(`http://localhost:8080/api/vehicles/${vehicleId}`, {
+              const response = await fetch(`${getApiBaseUrl()}/api/vehicles/${vehicleId}`, {
                 method: 'DELETE',
                 headers: {
                   'Authorization': `Bearer ${token}`,

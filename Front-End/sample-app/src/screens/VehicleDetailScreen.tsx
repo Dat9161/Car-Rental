@@ -6,8 +6,8 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation, useRoute, useFocusEffect } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Platform } from 'react-native';
 import { CommonActions } from '@react-navigation/native';
+import { getApiBaseUrl } from '../config/api.config';
 interface VehiclePhoto {
   id: number;
   url: string;
@@ -37,18 +37,12 @@ const getVehicleImageUrl = (vehicle: Vehicle): string => {
     imageUrl = vehicle.photos[0].url;
   }
   
-  // Nếu có URL, convert localhost thành 10.0.2.2 cho Android emulator
   if (imageUrl) {
-    const baseUrl = __DEV__
-      ? (Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080')
-      : 'https://your-api.com';
+    const baseUrl = getApiBaseUrl();
     
-    // Nếu URL đã là full URL với localhost, thay thế cho Android
-    if (Platform.OS === 'android' && imageUrl.includes('localhost')) {
-      imageUrl = imageUrl.replace('http://localhost:8080', baseUrl);
-    }
-    // Nếu URL là relative path, thêm base URL
-    else if (imageUrl.startsWith('/')) {
+    if (imageUrl.includes('localhost') || imageUrl.includes('10.0.2.2')) {
+      imageUrl = imageUrl.replace(/http:\/\/(localhost|10\.0\.2\.2):8080/g, baseUrl);
+    } else if (imageUrl.startsWith('/')) {
       imageUrl = baseUrl + imageUrl;
     }
     
@@ -86,10 +80,7 @@ const VehicleDetailScreen: React.FC = () => {
 
   const fetchVehicleDetails = async () => {
     try {
-      const baseUrl = __DEV__
-        ? (Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080')
-        : 'https://your-api.com';
-
+      const baseUrl = getApiBaseUrl();
       const response = await fetch(`${baseUrl}/api/vehicles/${vehicleId}`);
       if (response.ok) {
         const data = await response.json();
@@ -193,14 +184,10 @@ const VehicleDetailScreen: React.FC = () => {
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.photosScroll}>
               {vehicle.photos.map((photo) => {
                 let photoUrl = photo.url;
-                // Convert URL cho Android emulator
                 if (photoUrl) {
-                  const baseUrl = __DEV__
-                    ? (Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080')
-                    : 'https://your-api.com';
-                  
-                  if (Platform.OS === 'android' && photoUrl.includes('localhost')) {
-                    photoUrl = photoUrl.replace('http://localhost:8080', baseUrl);
+                  const baseUrl = getApiBaseUrl();
+                  if (photoUrl.includes('localhost') || photoUrl.includes('10.0.2.2')) {
+                    photoUrl = photoUrl.replace(/http:\/\/(localhost|10\.0\.2\.2):8080/g, baseUrl);
                   } else if (photoUrl.startsWith('/')) {
                     photoUrl = baseUrl + photoUrl;
                   }

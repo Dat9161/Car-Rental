@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getApiBaseUrl } from '../config/api.config';
 
 const AdminAddVehicleScreen: React.FC = () => {
   const navigation = useNavigation<any>();
@@ -61,7 +62,7 @@ const AdminAddVehicleScreen: React.FC = () => {
         return;
       }
 
-      const response = await fetch('http://localhost:8080/api/vehicles', {
+      const response = await fetch(`${getApiBaseUrl()}/api/vehicles`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

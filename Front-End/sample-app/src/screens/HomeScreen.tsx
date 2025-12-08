@@ -16,10 +16,10 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { fetchVehicles, Vehicle } from '../api/vehicleApi';
+import { getApiBaseUrl } from '../config/api.config';
 
 // Helper function để lấy ảnh xe
 const getVehicleImageUrl = (vehicle: Vehicle): string => {
-  // Ưu tiên primaryPhotoUrl, sau đó là ảnh đầu tiên trong photos, cuối cùng là placeholder
   let imageUrl: string | undefined;
   
   if (vehicle.primaryPhotoUrl) {
@@ -28,25 +28,18 @@ const getVehicleImageUrl = (vehicle: Vehicle): string => {
     imageUrl = vehicle.photos[0].url;
   }
   
-  // Nếu có URL, convert localhost thành 10.0.2.2 cho Android emulator
   if (imageUrl) {
-    const baseUrl = __DEV__
-      ? (Platform.OS === 'android' ? 'http://10.0.2.2:8080' : 'http://localhost:8080')
-      : 'https://your-api.com';
+    const baseUrl = getApiBaseUrl();
     
-    // Nếu URL đã là full URL với localhost, thay thế cho Android
-    if (Platform.OS === 'android' && imageUrl.includes('localhost')) {
-      imageUrl = imageUrl.replace('http://localhost:8080', baseUrl);
-    }
-    // Nếu URL là relative path, thêm base URL
-    else if (imageUrl.startsWith('/')) {
+    if (imageUrl.includes('localhost') || imageUrl.includes('10.0.2.2')) {
+      imageUrl = imageUrl.replace(/http:\/\/(localhost|10\.0\.2\.2):8080/g, baseUrl);
+    } else if (imageUrl.startsWith('/')) {
       imageUrl = baseUrl + imageUrl;
     }
     
     return imageUrl;
   }
   
-  // Fallback to placeholder
   return `https://placehold.co/150x100/f0f0f0/333333?text=${encodeURIComponent(vehicle.title.substring(0, 10))}`;
 };
 

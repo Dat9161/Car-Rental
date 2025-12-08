@@ -4,6 +4,7 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
+import { getApiBaseUrl } from '../config/api.config';
 
 interface Vehicle {
   id: number;
@@ -24,7 +25,7 @@ const VehicleListScreen: React.FC = () => {
 
   const fetchVehicles = async () => {
     try {
-      const response = await fetch('http://localhost:8080/api/vehicles');
+      const response = await fetch(`${getApiBaseUrl()}/api/vehicles`);
       if (response.ok) {
         const data = await response.json();
         setVehicles(data);
